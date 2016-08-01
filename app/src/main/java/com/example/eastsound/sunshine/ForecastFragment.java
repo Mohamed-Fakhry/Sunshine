@@ -1,9 +1,11 @@
 package com.example.eastsound.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -60,8 +62,7 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
 
         if(id == R.id.action_refersh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("94043");
+            updateWeather();
             return true;
         }
         else if (id == R.id.settings) {
@@ -70,6 +71,20 @@ public class ForecastFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = preferences.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     @Override
@@ -120,8 +135,7 @@ public class ForecastFragment extends Fragment {
                 "Sun - Sunny - 80/68"
         };
 
-        FetchWeatherTask weatherTask = new FetchWeatherTask();
-        weatherTask.execute("94043");
+        updateWeather();
 
         return forecastArray;
     }
